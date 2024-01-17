@@ -246,6 +246,16 @@ python -m llava.serve.cli \
 
 <img src="images/demo_cli.gif" width="70%">
 
+### Hippo API
+
+Run Hippo API to query directly to model, default port 8101
+
+```Shell
+python -m llava.serve.hippo_api --port [your-port]
+```
+
+You can view Hippo API documents at: localhost:[your-port]/docs
+
 ## Train
 
 *Below is the latest training configuration for LLaVA v1.5. For legacy models, please refer to README of [this](https://github.com/haotian-liu/LLaVA/tree/v1.0.1) version for now. We'll add them in a separate doc later.*
