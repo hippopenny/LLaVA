@@ -48,7 +48,7 @@ async def query(request: QueryModel):
     model_name = get_model_name_from_path(model_path)
     # Model
     print("Model name: ", model_name)
-    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, data['model_base'], model_name, data['load_8bit'], data['load_4bit'], device=data['device'])
+    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, data['model_base'], model_name, data['load_8bit'], data['load_4bit'], device=data['device'], device_map={'': 0})
     print("Model loaded")
     if 'llama-2' in model_name.lower():
         conv_mode = "llava_llama_2"
