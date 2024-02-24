@@ -29,7 +29,7 @@ class QueryModel(BaseModel):
     temperature: Optional[float] = 0.2
     max_new_tokens: Optional[int] = 512
     load_8bit: Optional[bool] = True
-    image_url: str
+    img: str
     prompt: str
 
 # Query AI modol with request body include image url and text (prompt)
@@ -48,6 +48,7 @@ async def query(request: QueryModel):
     model_name = get_model_name_from_path(model_path)
     # Model
     print("Model name: ", model_name)
+    print("Prompt: ", data['prompt'])
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, data['model_base'], model_name, data['load_8bit'], data['load_4bit'], device=data['device'], device_map={'': 0})
     print("Model loaded")
     if 'llama-2' in model_name.lower():
@@ -70,7 +71,7 @@ async def query(request: QueryModel):
     else:
         roles = conv.roles
 
-    image = load_image(data['image_url'])
+    image = load_image(data['img'])
     # Similar operation in model_worker.py
     image_tensor = process_images([image], image_processor, model.config)
     if type(image_tensor) is list:

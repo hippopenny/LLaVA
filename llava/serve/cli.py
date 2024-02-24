@@ -19,6 +19,9 @@ def load_image(image_file):
     if image_file.startswith('http://') or image_file.startswith('https://'):
         response = requests.get(image_file)
         image = Image.open(BytesIO(response.content)).convert('RGB')
+    # check if image in buffer string format
+    elif image_file.startswith('b\''):
+        image = Image.open(BytesIO(image_file.encode('utf-8'))).convert('RGB')
     else:
         image = Image.open(image_file).convert('RGB')
     return image
