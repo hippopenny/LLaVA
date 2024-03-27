@@ -28,10 +28,12 @@ app = FastAPI()
 class QueryModel(BaseModel):
     temperature: Optional[float] = 0.2
     max_new_tokens: Optional[int] = 512
-    load_8bit: Optional[bool] = True
     img: str
     prompt: str
 
+def memory_stats():
+    print(torch.cuda.memory_allocated()/1024**2)
+    print(torch.cuda.memory_cached()/1024**2)
 # Query AI modol with request body include image url and text (prompt)
 @app.post("/query")
 async def query(request: QueryModel):
@@ -39,12 +41,14 @@ async def query(request: QueryModel):
     # convert request to dict
     data = request.dict()
     # Hard code
+    data['load_8bit'] = False
     data['load_4bit'] = False
     data['model_base'] = None
     data['device'] = "cuda"
     data['conv_mode'] = None
     # Path on server
-    model_path = "liuhaotian/llava-v1.5-13b"
+    # model_path = "liuhaotian/llava-v1.5-13b"
+    model_path = "liuhaotian/llava-v1.6-vicuna-13b"
     model_name = get_model_name_from_path(model_path)
     # Model
     print("Model name: ", model_name)
@@ -113,6 +117,12 @@ async def query(request: QueryModel):
 
         outputs = tokenizer.decode(output_ids[0, input_ids.shape[1]:]).strip()         
         conv.messages[-1][-1] = outputs
+        import gc
+        model.cpu()
+        del model, tokenizer, image_processor, context_len
+        gc.collect()
+        torch.cuda.empty_cache()
+        print(memory_stats())
         return {"message": outputs}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
